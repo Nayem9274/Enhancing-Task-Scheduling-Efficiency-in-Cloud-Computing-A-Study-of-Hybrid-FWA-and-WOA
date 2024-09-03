@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
     private boolean recomputeCost = true;
     private double lastCost;
-    private double alpha = 0; // weight for makespan
+    private double alpha = (double) 4/5; // weight for makespan
     private double beta = 0;  // weight for load balancing
-    private double gamma = 1;  // weight for operational cost
+    private double gamma = (double) 1/5;  // weight for operational cost
     
     private static final double CPU_WEIGHT = 0.2;
     private static final double MEMORY_WEIGHT = 0.05;
@@ -64,11 +64,14 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
 
     private double computeCostOfAllVms() {
         var result = this.getResult().entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue));
+        //System.out.println(result);
 
         // Compute makespan
         double makespan = result.entrySet().stream().mapToDouble(entry -> {
             Vm vm = entry.getKey();
             List<Cloudlet> cloudlets = entry.getValue().stream().map(Map.Entry::getKey).collect(Collectors.toList());
+            //System.out.println(vm);
+            //System.out.println(cloudlets);
             return computeMakespan(vm, cloudlets);
         }).max().orElse(0);
         
@@ -81,21 +84,21 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
             List<Cloudlet> cloudlets = entry.getValue().stream().map(Map.Entry::getKey).collect(Collectors.toList());
             return computeTotalCost(vm, cloudlets);
         }).sum();
-        System.out.println("total cost: " + totalCost);
+        //System.out.println("total cost: " + totalCost);
 
         // Normalize the objectives
         double maxMakespan = getMaxMakespan(result);
-       // double maxLoadBalancing = getMaxLoadBalancing(result);
+        double maxLoadBalancing = getMaxLoadBalancing(result);
         double maxOperationalCost = getMaxOperationalCost(result);
 
-        double normalizedMakespan = makespan / maxMakespan;
-        //double normalizedLoadBalancing = loadBalancing / maxLoadBalancing;
-        double normalizedOperationalCost = totalCost / maxOperationalCost;
+        //double normalizedMakespan = makespan / maxMakespan;
+       // double normalizedLoadBalancing = loadBalancing / maxLoadBalancing;
+        //double normalizedOperationalCost = totalCost / maxOperationalCost;
 
-        double cost = alpha * makespan  + gamma * totalCost;
-        System.out.println("cost: " + cost);
+        double cost = alpha * makespan  + gamma * totalCost +beta *loadBalancing ;
+       // System.out.println("mspan: " + makespan+" tcost: "+totalCost+" lcost: "+loadBalancing);
 
-        return cost;
+        return cost*10E-3;
     }
     
 //    private double computeCostOfAllVms() {
@@ -153,9 +156,10 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
     private double computeMakespan(Vm vm, List<Cloudlet> cloudlets) {
         double makespan = cloudlets.stream().mapToDouble(cloudlet -> {
             double execTime = cloudlet.getTotalLength() / vm.getTotalMipsCapacity();
+            //System.out.println(execTime);
             return execTime;
         }).max().orElse(0);
-
+        //System.out.println(makespan);
         return makespan;
     }
     
@@ -201,24 +205,28 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
 //
 //            System.out.println("cpu: "+cpuUtilization+" bw: "+bwUtilization+" ram: "+ramUtilization);
 //
-//        for (Cloudlet cloudlet : cloudlets) {
-//
-//
+        final var cost = new VmCost(vm);
+        double processingTotalCost = 0, memoryTotaCost = 0, storageTotalCost = 0, bwTotalCost = 0;
+        double totalCost = 0.0;
+        for (Cloudlet cloudlet : cloudlets) {
+            totalCost += cost.getTotalCost();
+            processingTotalCost += cost.getProcessingCost();
+            memoryTotaCost += cost.getMemoryCost();
+            storageTotalCost += cost.getStorageCost();
+            bwTotalCost += cost.getBwCost();
+
 //            totalCpuCost += cpuUtilization * CPU_WEIGHT;
 //            totalBwCost += bwUtilization * BANDWIDTH_WEIGHT;
 //            totalRamCost += ramUtilization * RAM_WEIGHT;
-//        }
+        }
 //
 //        return totalCpuCost + totalBwCost + totalRamCost;
-        double totalCost = 0.0;
+
         int totalNonIdleVms = 0;
-        double processingTotalCost = 0, memoryTotaCost = 0, storageTotalCost = 0, bwTotalCost = 0;
-        final var cost = new VmCost(vm);
-        processingTotalCost += cost.getProcessingCost();
-        memoryTotaCost += cost.getMemoryCost();
-        storageTotalCost += cost.getStorageCost();
-        bwTotalCost += cost.getBwCost();
-        totalCost += cost.getTotalCost();
+
+
+
+
         //System.out.println("pcost: "+processingTotalCost+" mcost: "+memoryTotaCost+" scost: "+storageTotalCost+" bwcost: "+bwTotalCost+" totalcost: "+totalCost);
         return totalCost;
     }

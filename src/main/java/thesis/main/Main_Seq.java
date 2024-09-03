@@ -20,9 +20,9 @@ public class Main_Seq {
 	public static void main(String[] args) {
 	    if (args.length > 0)
 	        CLOUDLETS_TO_CREATE = Integer.parseInt(args[0]);
-	    int[] hosts = {10};
-	    int[] vms = {8};
-	    int[] cloudlets = {15};
+	    int[] hosts = {100};
+	    int[] vms = {50};
+	    int[] cloudlets = {100};
 	    //    int[] cloudlets = {10,20,40,80,100};
 
 	    // Write headers to the CSV file if the file does not exist

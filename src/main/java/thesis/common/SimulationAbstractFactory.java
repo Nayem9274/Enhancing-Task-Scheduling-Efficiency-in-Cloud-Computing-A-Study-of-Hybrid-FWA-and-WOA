@@ -89,14 +89,14 @@ public class SimulationAbstractFactory {
     }
 
     static private Host createHost(Random random) {
-    	 // capacity of each CPU core (in Million Instructions per Second)
-        final long mips = random.nextInt(500, 1501);
+        // capacity of each CPU core (in Million Instructions per Second)
+        final long mips = random.nextInt(5000, 15001);
         // host memory (Megabyte)
         final int ram = random.nextInt(8*1024, 12*1024);
         // host storage
         final long storage = random.nextInt(50000, 200001);
         // host bandwidth (Megabit/s)
-        final long bw = random.nextInt(4000, 10001);
+        final long bw = random.nextInt(4000, 16001);
 //        final long mips = 1500; // vm mips
 //        final long storage = 200000; // vm storage
 //        final int ram = 10*1024; // vm memory
@@ -107,7 +107,7 @@ public class SimulationAbstractFactory {
          * Creates the Host's CPU cores and defines the provisioner
          * used to allocate each core for requesting VMs.
          */
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < 10; i++)
             peList.add(new PeSimple(mips));
 
         final var powerModel = new PowerModelHostSimple(MAX_POWER, STATIC_POWER);
@@ -130,12 +130,12 @@ public class SimulationAbstractFactory {
     }
 
     static private VmExtended createVm(Random random) {
-    	final long mips = random.nextInt(500, 1501); // vm mips
+        final long mips = random.nextInt(500, 1501); // vm mips
         final long storage = random.nextInt(5000, 12000); // vm storage
-        final int ram = random.nextInt(256, 768); // vm memory
+        final int ram = random.nextInt(256, 1024); // vm memory
         final long bw = random.nextInt(400, 1600); // vm bandwidth
 
-        final int pesNumber = random.nextInt(1, 5);
+        final int pesNumber = random.nextInt(5, 7);
 
 //        final long mips = 1500; // vm mips
 //        final long storage = 12000; // vm storage
@@ -152,16 +152,16 @@ public class SimulationAbstractFactory {
     }
 
     static private Cloudlet createCloudlet(Random random) {
-    	  final long length = random.nextInt(1000, 5000); //Length of execution (in MI)
-          final long fileSize = random.nextInt(100, 500); //Size (in bytes) before execution
-          final long outputSize = random.nextInt(50, 400); //Size (in bytes) after execution
+        final long length = random.nextInt(1000, 5000); //Length of execution (in MI)
+        final long fileSize = random.nextInt(50, 200); //Size (in bytes) before execution
+        final long outputSize = random.nextInt(50, 200); //Size (in bytes) after execution
 
 //        final long length = 500; //Length of execution (in MI)
 //        final long fileSize = 500; //Size (in bytes) before execution
 //        final long outputSize = 400; //Size (in bytes) after execution
 //        final int pesNumber = 2;
 
-          final int pesNumber = random.nextInt(1, 3);
+        final int pesNumber = random.nextInt(1, 3);
 
         final var utilizationFull = new UtilizationModelFull();
         final var utilizationDynamic = new UtilizationModelDynamic(0.01);
@@ -202,21 +202,21 @@ public class SimulationAbstractFactory {
                         new CloudletToVmMappingFireworksAlgorithm(new UniformDistr(0, 1)),
                         hosts, vms, cloudlets
                 );
-                
+
             }
             case WHALEOPTIMIZATION_ALGORITHM -> {
                 return new Simulation(
                         new CloudletToVmMappingWhaleOptimizationAlgorithm(new UniformDistr(0, 1)),
                         hosts, vms, cloudlets
                 );
-                
+
             }
             case SEQUENTIAL_ALGORITHM -> {
                 return new Simulation(
                         new CloudletToVmMappingHybridSequentialAlgorithm(new UniformDistr(0, 1)),
                         hosts, vms, cloudlets
                 );
-                
+
             }
             default -> {
                 return null;
@@ -239,23 +239,37 @@ public class SimulationAbstractFactory {
             this.heuristic = heuristic;
             this.simulation = new CloudSimPlus();
             final var datacenter = new DatacenterSimple(simulation, hosts);
-//            datacenter.setSchedulingInterval(1);
+            //datacenter.setSchedulingInterval(1);
             datacenter.setVmAllocationPolicy(new VmAllocationPolicyBestFit());
-            datacenter.setCharacteristics(new DatacenterCharacteristicsSimple(0.01, 0.02, 0.001, 0.005));
+            datacenter.setCharacteristics(new DatacenterCharacteristicsSimple(
+                    0.00001, // costPerSecond
+                    0.00001, // costPerMem
+                    0.00001, // costPerStorage
+                    0.00001 // costPerBw
+            ));
             //datacenter.setSchedulingInterval(0.1); // Decrease interval for more frequent scheduling
             this.broker = new DatacenterBrokerHeuristic(simulation);
             this.broker.setHeuristic(heuristic);
             this.broker.submitVmList(vms);
             this.broker.submitCloudletList(cloudlets);
-            
-            // Increased VM destruction delay
-           // this.broker.setVmDestructionDelay(100);
-            
-        
-            
 
-            this.simulation.start();
+            // Increased VM destruction delay
+            // this.broker.setVmDestructionDelay(100);
+
+
+
+
+            // Start the simulation
+            try {
+                this.simulation.start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             // Prints the list (output shown in console )
+            System.out.println("Simulation Time: " + simulation.clock());
+            System.out.println("Cloudlets Finished: " + broker.getCloudletFinishedList().size());
+            System.out.println("Cloudlets in Progress: " + broker.getCloudletSubmittedList().size());
+
             final var cloudletFinishedList = broker.getCloudletFinishedList();
             new CloudletsTableBuilder(cloudletFinishedList).build();
 //            printVmsCpuUtilizationAndPowerConsumption(new ArrayList<>(vms));

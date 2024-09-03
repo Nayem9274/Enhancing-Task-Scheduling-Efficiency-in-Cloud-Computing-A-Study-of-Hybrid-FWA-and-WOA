@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletToVmMappingHeuristic {
-    public static final int POPULATION_SIZE = 10;
-    public static final int MAX_ITERATIONS = 100;
+    public static final int POPULATION_SIZE = 100;
+    public static final int MAX_ITERATIONS = 400;
 
     private final ContinuousDistribution random;
     private int searchesByIteration;
@@ -44,7 +44,7 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
     private void setSolveTime(double v) {
         this.solveTime = v;
     }
-    
+
     @Override
     public List<Cloudlet> getCloudletList() {
         return cloudletList;
@@ -83,12 +83,12 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
         double uniform = random.sample();
         return (int) (uniform >= 1.0 ? uniform % (double) maxValue : uniform * (double) maxValue);
     }
-//
+    //
     private Vm getRandomVm() {
         int idx = getRandomValue(vmList.size());
         return vmList.get(idx);
     }
-    
+
 //    public Vm getRandomVm() {
 //        int idx = (int) (Math.random() * vmList.size()); // Use Math.random() for uniform distribution
 //        return vmList.get(idx);
@@ -132,7 +132,7 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
         cloudletList.forEach(cloudlet -> solution.bindCloudletToVm(cloudlet, getRandomVm()));
         return solution;
     }
-    
+
 //    private CloudletToVmMappingSolution generateRandomSolution() {
 //        CloudletToVmMappingSolution solution = new WeightedCloudletToVmSolution(this);
 //
@@ -161,7 +161,7 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
         double r = random.sample();
         double A = 2 * a * r - a;
         double C = 2 * r;
-       // System.out.println("A: "+A+" C: "+C+" a: "+a);
+        //System.out.println("A: "+A+" C: "+C+" a: "+a);
         return new double[]{A, C, a};
     }
 
@@ -193,7 +193,7 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
             Vm bestVm = best.getResult().get(cloudlet);
             Vm whaleVm = whale.getResult().get(cloudlet);
             double D = Math.abs(bestVm.getId() - whaleVm.getId());
-           // System.out.println("D(spiral pos): "+D);
+            // System.out.println("D(spiral pos): "+D);
             int newVmId = (int) (D * Math.exp(b * l) * Math.cos(2 * Math.PI * l) + bestVm.getId());
             //System.out.println("newVmId(spiral pos) : "+newVmId);
             newVmId = Math.floorMod(newVmId, vmList.size());
@@ -234,7 +234,7 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
                         newPopulation.add(createNewPosition(whale, bestSolutionSoFar, A, C));
                     } else {
                         int randIdx = getRandomValue(population.size());
-                       // logger.debug("[#{}] : {}", iteration, randIdx);
+                        // logger.debug("[#{}] : {}", iteration, randIdx);
                         newPopulation.add(createNewPosition(whale, population.get(randIdx), A, C));
                     }
                 } else {
@@ -250,7 +250,7 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
                         newWhale.bindCloudletToVm(cloudlet, getRandomVm());
                     }
                 }
-                
+
             }
 
             population = newPopulation;
@@ -259,9 +259,9 @@ public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletTo
             if (iteration % 50 == 0) {
                 logger.debug("[#{}] : {}", iteration, bestSolutionSoFar.getResult());
                 logger.debug("[#{}] : {}", iteration, bestSolutionSoFar.getFitness());
-               
-             
-               // logger.debug("Population fitness: {}", population.stream().map(CloudletToVmMappingSolution::getFitness).collect(Collectors.toList()));
+
+
+                // logger.debug("Population fitness: {}", population.stream().map(CloudletToVmMappingSolution::getFitness).collect(Collectors.toList()));
             }
         }
 

@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class CloudletToVmMappingFireworksAlgorithm implements CloudletToVmMappingHeuristic {
-    public static final int POPULATION_SIZE = 10;
-    public static final int MAX_ITERATIONS = 100;
+    public static final int POPULATION_SIZE = 100;
+    public static final int MAX_ITERATIONS = 400;
     public static final int A = 40;
     public static final int m = 800;
     public static final double a = 0.04;

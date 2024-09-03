@@ -35,9 +35,9 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
     private List<Vm> vmList;
     private final static Logger logger = LoggerFactory.getLogger(CloudletToVmMappingHybridSequentialAlgorithm.class.getSimpleName());
 
-    public static final int MAX_ITER_FWA = 400;
-    public static final int MAX_ITER_WOA = 400;
-    public static final int POPULATION_SIZE = 200;
+    public static final int MAX_ITER_FWA = 100;
+    public static final int MAX_ITER_WOA = 100;
+    public static final int POPULATION_SIZE = 100;
     public static final int A = 40;
     public static final int m = 800;
     public static final double a = 0.04;
@@ -97,15 +97,15 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         return (int) (uniform >= 1.0 ? uniform % (double) maxValue : uniform * (double) maxValue);
     }
     
-//    private Vm getRandomVm() {
-//        int idx = getRandomValue(vmList.size());
-//        return vmList.get(idx);
-//    }
-    
     private Vm getRandomVm() {
-        int idx = (int) (Math.random() * vmList.size()); // Use Math.random() for uniform distribution
+        int idx = getRandomValue(vmList.size());
         return vmList.get(idx);
     }
+    
+//    private Vm getRandomVm() {
+//        int idx = (int) (Math.random() * vmList.size()); // Use Math.random() for uniform distribution
+//        return vmList.get(idx);
+//    }
 
     @Override
     public CloudletToVmMappingSolution getInitialSolution() {
@@ -139,6 +139,12 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
     public boolean isToStopSearch() {
         return false;
     }
+    
+//    private CloudletToVmMappingSolution generateRandomSolution() {
+//        CloudletToVmMappingSolution solution = new WeightedCloudletToVmSolution(this);
+//        cloudletList.forEach(cloudlet -> solution.bindCloudletToVm(cloudlet, getRandomVm()));
+//        return solution;
+//    }
 
     private CloudletToVmMappingSolution generateRandomSolution() {
         CloudletToVmMappingSolution solution = new WeightedCloudletToVmSolution(this);
@@ -273,8 +279,8 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         }
     }
 
-/*    
-    //Use of  Load Distribution
+    
+/*    //Use of  Load Distribution
     private void mutateSpark(CloudletToVmMappingSolution spark, double amplitude) {
         // Determine the number of dimensions to mutate
         int z = (int) (cloudletList.size() * random.sample());
@@ -333,7 +339,7 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         return spark;
     }
 
-    /*
+    
     public void mutateGaussianSpark(CloudletToVmMappingSolution spark) {
         // Determine the number of dimensions to mutate
         int z = (int) (cloudletList.size() * random.sample());
@@ -361,8 +367,8 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
             spark.bindCloudletToVm(cloudletList.get(dimension), newVm);
         }
     }
-*/
-   
+
+/*   
  // Load Distribution    
     private void mutateGaussianSpark(CloudletToVmMappingSolution spark) {
         // Determine the number of dimensions to mutate
@@ -410,7 +416,7 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
             spark.bindCloudletToVm(cloudletList.get(dimension), newVm);
         }
     }
-
+*/
     public void updateBestSolution(List<CloudletToVmMappingSolution> population) {
     	population.sort((s1, s2) -> Double.compare(s2.getFitness(), s1.getFitness()));
         if (bestSolutionSoFar == null || population.get(0).getFitness() > bestSolutionSoFar.getFitness()) {
@@ -488,7 +494,7 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
 
     public CloudletToVmMappingSolution createSpiralPosition(CloudletToVmMappingSolution whale, CloudletToVmMappingSolution best) {
         CloudletToVmMappingSolution newWhale = new WeightedCloudletToVmSolution(this);
-        double b = 1;
+        double b = 2;
         double l = random.sample() * 2 - 1; // a random number in [ −1,1]
         for (Cloudlet cloudlet : cloudletList) {
             Vm bestVm = best.getResult().get(cloudlet);
@@ -503,7 +509,8 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         }
         return newWhale;
     }
-    
+
+/*
     @Override
     public CloudletToVmMappingSolution solve() {
     	
@@ -549,7 +556,7 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
                               sparks.add(createSpark(whale, amplitude));
                           }
                           // Select best sparks and replace less fit solutions
-                          sparks = selectBestSparks(sparks, numSparks);
+                          //sparks = selectBestSparks(sparks, numSparks);
                           newPopulation.addAll(sparks);
                         //int randIdx = getRandomValue(population.size());
                        // logger.debug("[#{}] : {}", iteration, randIdx);
@@ -588,6 +595,7 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         setSolveTime((System.currentTimeMillis() - startTime) / 1000.0);
         return bestSolutionSoFar;
     }
+*/
   	  
  //  select the best sparks to maintain population size
     private List<CloudletToVmMappingSolution> selectBestSparks(List<CloudletToVmMappingSolution> sparks, int targetSize) {
@@ -662,7 +670,85 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         setSolveTime((System.currentTimeMillis() - startTime) / 1000.0);
         return bestSolutionSoFar;
     }
+    
 */
+    @Override
+    public CloudletToVmMappingSolution solve() {
+        long startTime = System.currentTimeMillis();
+
+        // Initial population with FWA
+        List<CloudletToVmMappingSolution> population = generateInitialPopulation();
+        population.sort((s1, s2) -> Double.compare(s2.getFitness(), s1.getFitness()));
+        bestSolutionSoFar = population.get(0);
+        updateBestSolution(Collections.singletonList(bestSolutionSoFar));
+
+        int fwaIterations = 0;
+        int woaIterations = 0;
+        int maxNoImprovementIters = 10;
+        int noImprovementCounter = 0;
+        double previousBestFitness = bestSolutionSoFar.getFitness();
+
+        while (fwaIterations < MAX_ITER_FWA && woaIterations < MAX_ITER_WOA) {
+            // Run FWA for a few iterations
+            List<CloudletToVmMappingSolution> fwaPopulation = new ArrayList<>(population);
+            for (int i = 0; i < 10 && fwaIterations < MAX_ITER_FWA; i++) {
+                fwaPopulation = runFWA(fwaPopulation);
+                fwaIterations++;
+                //logger.debug("FWA [#%5d] : %.6f".formatted(fwaIterations, bestSolutionSoFar.getFitness()));
+            }
+            //System.out.println("FWA Pop Size: "+ fwaPopulation.size());
+            //logger.debug("[#{}] : {}", fwaIterations, bestSolutionSoFar.getResult());
+            logger.debug("FWA [#%5d] : %.6f".formatted(fwaIterations, bestSolutionSoFar.getFitness()));
+            logger.debug("[#{}] : {}", bestSolutionSoFar.getResult());
+            // Run WOA for a few iterations
+            List<CloudletToVmMappingSolution> woaPopulation = new ArrayList<>(population);
+            for (int i = 0; i < 10 && woaIterations < MAX_ITER_WOA; i++) {
+                woaPopulation = runWOA(woaPopulation, woaIterations);
+                woaIterations++;
+                //logger.debug("WOA [#%5d] : %.6f".formatted(woaIterations, bestSolutionSoFar.getFitness()));
+            }
+            //System.out.println("WOA Pop Size: "+ woaPopulation.size());
+            //logger.debug("[#{}] : {}", woaIterations, bestSolutionSoFar.getResult());
+            logger.debug("WOA [#%5d] : %.6f".formatted(woaIterations, bestSolutionSoFar.getFitness()));
+            logger.debug("[#{}] : {}", bestSolutionSoFar.getResult());
+            // Combine FWA and WOA populations
+            population = new ArrayList<>();
+            population.addAll(fwaPopulation);
+            population.addAll(woaPopulation);
+
+            // Sort the combined population by fitness
+           // population.sort((s1, s2) -> Double.compare(s2.getFitness(), s1.getFitness()));
+
+            // Keep only the top solutions to maintain population size
+           // population = population.subList(0, Math.min(population.size(), POPULATION_SIZE));
+            population=maintainPopulationSize(population,POPULATION_SIZE);
+
+            // Update the best solution so far
+            updateBestSolution(population);
+
+            // Checking for improvement
+            double currentBestFitness = bestSolutionSoFar.getFitness();
+            if (currentBestFitness <= previousBestFitness) {
+                noImprovementCounter++;
+            } else {
+                noImprovementCounter = 0;
+                previousBestFitness = currentBestFitness;
+            }
+
+            // Switching if no improvement
+            if (noImprovementCounter >= maxNoImprovementIters) {
+                noImprovementCounter = 0;
+                // introduce new individuals to increase diversity
+                population = introduceMoreDiversity(population);
+            }
+        }
+        logger.debug("FINAL [#%5d] : %.6f".formatted(woaIterations, bestSolutionSoFar.getFitness()));
+        logger.debug("[#{}] : {}", bestSolutionSoFar.getResult());
+        setSolveTime((System.currentTimeMillis() - startTime) / 1000.0);
+        return bestSolutionSoFar;
+    }
+
+    
     private List<CloudletToVmMappingSolution> runFWA(List<CloudletToVmMappingSolution> population) {
         OptionalDouble maxFitnessOptional = population.stream()
                 .mapToDouble(HeuristicSolution::getFitness)
@@ -691,6 +777,7 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         }
 
         population.addAll(sparks);
+        updateBestSolution(population);
         population = selectNewPopulation(population);
 
         return population;
@@ -703,6 +790,9 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         double a = coefficients[2];
 
         List<CloudletToVmMappingSolution> newPopulation = new ArrayList<>();
+        //System.out.println("WOA newPopulation Size(Initial): "+ newPopulation.size());
+        //logger.debug("BEGINNING [#%5d] : %.6f".formatted(woaIterations, bestSolutionSoFar.getFitness()));
+        
 
         for (CloudletToVmMappingSolution whale : population) {
             double p = random.sample();
@@ -719,8 +809,26 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         }
 
         population = newPopulation;
+        updateBestSolution(population);
+        //logger.debug("ENDING [#%5d] : %.6f".formatted(woaIterations, bestSolutionSoFar.getFitness()));
+  
         return population;
     }
+    
+
+private List<CloudletToVmMappingSolution> introduceMoreDiversity(List<CloudletToVmMappingSolution> population) {
+    // Implement a more aggressive strategy to introduce diversity
+    List<CloudletToVmMappingSolution> newPopulation = new ArrayList<>(population);
+
+    // Add new random individuals
+    for (int i = 0; i < POPULATION_SIZE / 2; i++) {
+        newPopulation.add(generateRandomSolution());
+    }
+
+    // Ensure the population size remains constant
+    newPopulation.sort((s1, s2) -> Double.compare(s2.getFitness(), s1.getFitness()));
+    return newPopulation.subList(0, Math.min(newPopulation.size(), POPULATION_SIZE));
+}
     
     private List<CloudletToVmMappingSolution> introduceDiversity(List<CloudletToVmMappingSolution> population) {
         int newIndividualsCount = (int) (population.size() * 0.1);
@@ -729,8 +837,10 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         }
         return population;
     }
-     
-/*   @Override public CloudletToVmMappingSolution solve() {
+
+/*    
+    
+   @Override public CloudletToVmMappingSolution solve() {
 
         long startTime = System.currentTimeMillis();
         
@@ -848,4 +958,5 @@ public class CloudletToVmMappingHybridSequentialAlgorithm implements CloudletToV
         return bestSolutionSoFar;
     }
     */
+    
 }
