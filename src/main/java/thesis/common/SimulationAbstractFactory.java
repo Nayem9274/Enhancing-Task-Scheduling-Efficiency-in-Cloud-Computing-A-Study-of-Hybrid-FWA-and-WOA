@@ -6,9 +6,11 @@ import org.cloudsimplus.datacenters.DatacenterCharacteristicsSimple;
 import thesis.fwa.CloudletToVmMappingFireworksAlgorithm;
 import thesis.sequential.CloudletToVmMappingHybridSequentialAlgorithm;
 import thesis.woa.CloudletToVmMappingWhaleOptimizationAlgorithm;
+import thesis.parallel.CloudletToVmMappingHybridParallelAlgorithm;
 
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicyBestFit;
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicyFirstFit;
+import org.cloudsimplus.allocationpolicies.VmAllocationPolicyRoundRobin;
 import org.cloudsimplus.brokers.DatacenterBrokerHeuristic;
 import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 import org.cloudsimplus.cloudlets.Cloudlet;
@@ -152,10 +154,10 @@ public class SimulationAbstractFactory {
     }
 
     static private Cloudlet createCloudlet(Random random) {
+
         final long length = random.nextInt(1000, 5000); //Length of execution (in MI)
         final long fileSize = random.nextInt(50, 200); //Size (in bytes) before execution
         final long outputSize = random.nextInt(50, 200); //Size (in bytes) after execution
-
 //        final long length = 500; //Length of execution (in MI)
 //        final long fileSize = 500; //Size (in bytes) before execution
 //        final long outputSize = 400; //Size (in bytes) after execution
@@ -180,6 +182,7 @@ public class SimulationAbstractFactory {
     public static final String FIREWORKS_ALGORITHM="FWA";
     public static final String WHALEOPTIMIZATION_ALGORITHM="WOA";
     public static final String SEQUENTIAL_ALGORITHM="SEQUENTIAL";
+    public static final String PARALLEL_ALGORITHM="PARALLEL";
 
     public Simulation getAlgorithm(String type) {
         initialize();
@@ -218,6 +221,13 @@ public class SimulationAbstractFactory {
                 );
 
             }
+            case PARALLEL_ALGORITHM -> {
+                return new Simulation(
+                        new CloudletToVmMappingHybridParallelAlgorithm(new UniformDistr(0, 1)),
+                        hosts, vms, cloudlets
+                );
+
+            }
             default -> {
                 return null;
             }
@@ -240,7 +250,7 @@ public class SimulationAbstractFactory {
             this.simulation = new CloudSimPlus();
             final var datacenter = new DatacenterSimple(simulation, hosts);
             //datacenter.setSchedulingInterval(1);
-            datacenter.setVmAllocationPolicy(new VmAllocationPolicyBestFit());
+            datacenter.setVmAllocationPolicy(new VmAllocationPolicyRoundRobin());
             datacenter.setCharacteristics(new DatacenterCharacteristicsSimple(
                     0.00001, // costPerSecond
                     0.00001, // costPerMem

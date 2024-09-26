@@ -53,6 +53,7 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
     @Override
     public double getCost() {
         this.recomputeCostIfRequested();
+        //System.out.println(this.lastCost);
         return this.lastCost;
     }
 
@@ -96,7 +97,7 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
         //double normalizedOperationalCost = totalCost / maxOperationalCost;
 
         double cost = alpha * makespan  + gamma * totalCost +beta *loadBalancing ;
-       // System.out.println("mspan: " + makespan+" tcost: "+totalCost+" lcost: "+loadBalancing);
+       // System.out.println("mspan: " + makespan+" tcost: "+totalCost+" lcost: "+loadBalancing +" cost: "+ cost*10E-3);
 
         return cost*10E-3;
     }
@@ -210,10 +211,10 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
         double totalCost = 0.0;
         for (Cloudlet cloudlet : cloudlets) {
             totalCost += cost.getTotalCost();
-            processingTotalCost += cost.getProcessingCost();
-            memoryTotaCost += cost.getMemoryCost();
-            storageTotalCost += cost.getStorageCost();
-            bwTotalCost += cost.getBwCost();
+            processingTotalCost += cost.getProcessingCost();//4 (negligible)
+            memoryTotaCost += cost.getMemoryCost(); //3
+            storageTotalCost += cost.getStorageCost(); //1 (high) - 10 times more than bwcost
+            bwTotalCost += cost.getBwCost(); //2
 
 //            totalCpuCost += cpuUtilization * CPU_WEIGHT;
 //            totalBwCost += bwUtilization * BANDWIDTH_WEIGHT;
