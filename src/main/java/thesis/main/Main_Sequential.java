@@ -17,7 +17,7 @@ public class Main_Sequential {
 
     private static int HOSTS_TO_CREATE = 100;
     private static int VMS_TO_CREATE = 50;
-    private static int CLOUDLETS_TO_CREATE = 100;
+    private static int CLOUDLETS_TO_CREATE = 80;
 
     public static void main(String[] args) {
         if (args.length > 0)
@@ -28,7 +28,7 @@ public class Main_Sequential {
 
         int[] hosts = {100};
         int[] vms = {50};
-        int[] cloudlets = {100};
+        int[] cloudlets = {80};
         // int[] cloudlets = {10, 20, 35, 50, 65, 80, 100, 150, 200};
 
         // Write headers to the CSV file

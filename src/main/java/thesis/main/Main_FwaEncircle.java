@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
-public class Main_Seq {
+public class Main_FwaEncircle {
 	private static int HOSTS_TO_CREATE = 100;
 	private static int VMS_TO_CREATE = 50;
 	private static int CLOUDLETS_TO_CREATE = 100;
@@ -26,14 +26,14 @@ public class Main_Seq {
 	    //    int[] cloudlets = {10,20,40,80,100};
 
 	    // Write headers to the CSV file if the file does not exist
-	    if (!new File("SEQ.csv").exists())
-	        writeHeadersToFile("SEQ.csv");
+	    if (!new File("enc.csv").exists())
+	        writeHeadersToFile("enc.csv");
 
 	    for (int host : hosts) {
 	        for (int vm : vms) {
 	            for (int cloudlet : cloudlets) {
 	               // if (cloudlet > 2 * host || vm > 2 * host || cloudlet > 3 * vm) continue;
-	                for (int i = 0; i < 5; i++)
+	                for (int i = 0; i < 15; i++)
 	                    simulate(host, vm, cloudlet);
 	            }
 	        }
@@ -43,61 +43,61 @@ public class Main_Seq {
 	private static void simulate(int HOSTS_TO_CREATE, int VMS_TO_CREATE, int CLOUDLETS_TO_CREATE) {
 	    System.out.printf("Starting Simulations [%d, %d, %d]\n", HOSTS_TO_CREATE, VMS_TO_CREATE, CLOUDLETS_TO_CREATE);
 	    final var factory = new SimulationAbstractFactory(HOSTS_TO_CREATE, VMS_TO_CREATE, CLOUDLETS_TO_CREATE);
-	    var sequentialAlgorithm = factory.getAlgorithm(SimulationAbstractFactory.SEQUENTIAL_ALGORITHM);
+	    var encAlgorithm = factory.getAlgorithm(SimulationAbstractFactory.FWA_ENCIRCLING_ALGORITHM);
 	    System.out.printf(
 	            "Execution Time: \t\t%.2f\n",
-	            sequentialAlgorithm.getExecutionTime()
+	            encAlgorithm.getExecutionTime()
 	    );
 
 	    System.out.printf(
 	            "Fitness: \t\t\t%.6f\n",
-	            sequentialAlgorithm.getFitness()
+	            encAlgorithm.getFitness()
 	    );
 
 	    System.out.printf(
 	            "CPU Utilization: \t%.2f\n",
-	            sequentialAlgorithm.getCPUUtilization()
+	            encAlgorithm.getCPUUtilization()
 	    );
 
 	    System.out.printf(
 	            "RAM Utilization: \t%.2f\n",
-	            sequentialAlgorithm.getMemoryUtilization()
+	            encAlgorithm.getMemoryUtilization()
 	    );
 
 	    System.out.printf(
 	            "B/W Utilization: \t%.2f\n",
-	            sequentialAlgorithm.getBandwidthUtilization()
+	            encAlgorithm.getBandwidthUtilization()
 	    );
 
 	    System.out.printf(
 	            "CPU Usage Mean: \t\t%.2f\n",
-	            sequentialAlgorithm.getCPUUsageMean()
+	            encAlgorithm.getCPUUsageMean()
 	    );
 
 	    System.out.printf(
 	            "CPU Usage StdDev: \t%.2f\n",
-	            sequentialAlgorithm.getCPUUsageStandardDeviation()
+	            encAlgorithm.getCPUUsageStandardDeviation()
 	    );
 
 	    System.out.printf(
 	            "Power Consumption: \t%.2f\n",
-	            sequentialAlgorithm.powerConsumptionMean()
+	            encAlgorithm.powerConsumptionMean()
 	    );
 
 
 
-	    writeToFile("seq.csv", "%d,%d,%d,%.2f,%.6f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n".formatted(
+	    writeToFile("enc.csv", "%d,%d,%d,%.2f,%.6f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n".formatted(
 	            HOSTS_TO_CREATE,
 	            VMS_TO_CREATE,
 	            CLOUDLETS_TO_CREATE,
-	            sequentialAlgorithm.getExecutionTime(),
-	            sequentialAlgorithm.getFitness(),
-	            sequentialAlgorithm.getCPUUtilization(),
-	            sequentialAlgorithm.getMemoryUtilization(),
-	            sequentialAlgorithm.getBandwidthUtilization(),
-	            sequentialAlgorithm.powerConsumptionMean(),
-	            sequentialAlgorithm.getCPUUsageMean(),
-	            sequentialAlgorithm.getCPUUsageStandardDeviation()
+	            encAlgorithm.getExecutionTime(),
+	            encAlgorithm.getFitness(),
+	            encAlgorithm.getCPUUtilization(),
+	            encAlgorithm.getMemoryUtilization(),
+	            encAlgorithm.getBandwidthUtilization(),
+	            encAlgorithm.powerConsumptionMean(),
+	            encAlgorithm.getCPUUsageMean(),
+	            encAlgorithm.getCPUUsageStandardDeviation()
 	    ));
 
 
@@ -105,7 +105,7 @@ public class Main_Seq {
 	}
 
 	private static void writeHeadersToFile(String filePath) {
-	    String headers = "hosts,vms,cloudlets,seq_time,seq_fitness,seq_cpu_util,seq_ram_util,seq_bw_util,seq_power,seq_cpu_mean,seq_cpu_std\n";
+	    String headers = "hosts,vms,cloudlets,enc_time,enc_fitness,enc_cpu_util,enc_ram_util,enc_bw_util,enc_power,enc_cpu_mean,enc_cpu_std\n";
 	    try (FileWriter fw = new FileWriter(filePath, false); // Open in write mode to overwrite
 	         BufferedWriter writer = new BufferedWriter(fw)) {
 	        writer.write(headers);
@@ -125,3 +125,4 @@ public class Main_Seq {
 
 
 }
+

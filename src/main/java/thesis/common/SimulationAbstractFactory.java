@@ -7,7 +7,7 @@ import thesis.fwa.CloudletToVmMappingFireworksAlgorithm;
 import thesis.sequential.CloudletToVmMappingHybridSequentialAlgorithm;
 import thesis.woa.CloudletToVmMappingWhaleOptimizationAlgorithm;
 import thesis.parallel.CloudletToVmMappingHybridParallelAlgorithm;
-
+import thesis.Combined.*;
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicyBestFit;
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicyFirstFit;
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicyRoundRobin;
@@ -74,7 +74,7 @@ public class SimulationAbstractFactory {
     }
 
     private void initialize() {
-        Random random = new Random(seed);
+        Random random = new Random(12345);
 
         this.hosts = new ArrayList<Host>();
         for (int i = 0; i < HOSTS_TO_CREATE; i++)
@@ -155,7 +155,7 @@ public class SimulationAbstractFactory {
 
     static private Cloudlet createCloudlet(Random random) {
 
-        final long length = random.nextInt(1000, 5000); //Length of execution (in MI)
+        final long length = random.nextInt(10, 1700); //Length of execution (in MI) (1000,5000)-->before
         final long fileSize = random.nextInt(50, 200); //Size (in bytes) before execution
         final long outputSize = random.nextInt(50, 200); //Size (in bytes) after execution
 //        final long length = 500; //Length of execution (in MI)
@@ -183,6 +183,8 @@ public class SimulationAbstractFactory {
     public static final String WHALEOPTIMIZATION_ALGORITHM="WOA";
     public static final String SEQUENTIAL_ALGORITHM="SEQUENTIAL";
     public static final String PARALLEL_ALGORITHM="PARALLEL";
+    public static final String FWA_ENCIRCLING_ALGORITHM="FwaEncircle";
+    public static final String WOA_SPARK_ALGORITHM="WoaSpark";
 
     public Simulation getAlgorithm(String type) {
         initialize();
@@ -224,6 +226,20 @@ public class SimulationAbstractFactory {
             case PARALLEL_ALGORITHM -> {
                 return new Simulation(
                         new CloudletToVmMappingHybridParallelAlgorithm(new UniformDistr(0, 1)),
+                        hosts, vms, cloudlets
+                );
+
+            }
+            case FWA_ENCIRCLING_ALGORITHM -> {
+                return new Simulation(
+                        new CloudletToVmMappingHybridFwaEncircleAlgorithm(new UniformDistr(0, 1)),
+                        hosts, vms, cloudlets
+                );
+
+            }
+            case WOA_SPARK_ALGORITHM -> {
+                return new Simulation(
+                        new CloudletToVmMappingHybridWoaSparkAlgorithm(new UniformDistr(0, 1)),
                         hosts, vms, cloudlets
                 );
 

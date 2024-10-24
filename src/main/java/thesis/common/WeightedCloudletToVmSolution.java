@@ -33,7 +33,11 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
     private static final double STORAGE_TRAN_COST = 0.01;
     private static final double BANDWIDTH_TRAN_COST = 0.01;
     
-    public static final double PES_WEIGHT = 0.2, RAM_WEIGHT = 0.2, BANDWIDTH_WEIGHT = 0.2, THROUGHPUT_WEIGHT = 0.5, EXECUTION_TIME_WEIGHT = 0.5;
+    //public static final double PES_WEIGHT = 0.2, RAM_WEIGHT = 0.2, BANDWIDTH_WEIGHT = 0.2, THROUGHPUT_WEIGHT = 0.5, EXECUTION_TIME_WEIGHT = 0.5;
+
+    public static final double PES_WEIGHT = 0.2, RAM_WEIGHT = 0.2, BANDWIDTH_WEIGHT = 0.1, THROUGHPUT_WEIGHT = 0.25, EXECUTION_TIME_WEIGHT = 0.25;
+    private Map<Vm, Double> pesUsages = new HashMap<Vm, Double>();
+    private Map<Vm, Double> timeUsages = new HashMap<Vm, Double>();
 
     public WeightedCloudletToVmSolution(Heuristic heuristic) {
         super(heuristic);
@@ -63,6 +67,63 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
         return this.getCost();
     }
 
+    private double computeCostOfAllVms() {
+        var result = this.getResult().entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue));
+        var costSum = result.entrySet().stream().mapToDouble(this::getVmCost).sum();
+        // System.out.println(this.pesUsages.size());
+        var standardizePesCost = this.pesUsages.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .map(cost -> cost / this.pesUsages.values().stream()
+                        .mapToDouble(Double::doubleValue).average().getAsDouble())
+                .average().orElse(0.0);
+        // standardizePesCost = standardizePesCost.getAsDouble();
+        // System.out.println("standard pes cost " + standardizePesCost);
+        var standardizeTimeCost = this.timeUsages.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .map(cost -> cost / this.pesUsages.values().stream().mapToDouble(Double::doubleValue).average().getAsDouble()).average().orElse(0.0);
+        // System.out.println(standardizePesCost + " " + standardizeTimeCost);
+
+        var totalCost = costSum + standardizePesCost * PES_WEIGHT + standardizeTimeCost * EXECUTION_TIME_WEIGHT;
+
+        // System.out.println(totalCost);
+        // System.out.println("Total Cost: " + totalCost);
+        // System.out.println("result size: " + result.size());
+        return result.size() == 0 ? Double.MAX_VALUE : totalCost / result.size();
+    }
+
+    @Override
+    public double getVmCost(Vm vm, List<Cloudlet> cloudlets) {
+        double cost = 0;
+
+        double ramUtilization = cloudlets.stream().mapToDouble(Cloudlet::getUtilizationOfRam).sum();
+        double bandwidthUtilization = cloudlets.stream().mapToDouble(Cloudlet::getUtilizationOfBw).sum();
+        double cpuUtilization = cloudlets.stream().mapToDouble(Cloudlet::getUtilizationOfCpu).sum();
+
+        double pesNeeded = cloudlets.stream().mapToDouble(Cloudlet::getPesNumber).sum();
+        double instructionCount = cloudlets.stream().mapToDouble(Cloudlet::getTotalLength).sum();
+        // System.out.println("Instruction Count: " + instructionCount);
+        // System.out.println("Pes Needed: " + pesNeeded);
+        // System.out.println("Total Mips Capacity: " + vm.getTotalMipsCapacity());
+        // System.out.println("Pes Number: " + vm.getPesNumber());
+
+
+
+        double relativePesCount = pesNeeded / vm.getPesNumber();
+        double relativeTotalTime = instructionCount / vm.getTotalMipsCapacity();
+
+        cost += ramUtilization * RAM_WEIGHT;
+        cost += bandwidthUtilization * BANDWIDTH_WEIGHT;
+        cost += cpuUtilization * THROUGHPUT_WEIGHT;
+
+        this.pesUsages.put(vm, relativePesCount);
+        this.timeUsages.put(vm, relativeTotalTime);
+
+        cost += relativePesCount * PES_WEIGHT;
+        cost += relativeTotalTime * EXECUTION_TIME_WEIGHT;
+
+        return cost;
+    }
+/*
     private double computeCostOfAllVms() {
         var result = this.getResult().entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue));
         //System.out.println(result);
@@ -100,8 +161,8 @@ public class WeightedCloudletToVmSolution extends CloudletToVmMappingSolution {
        // System.out.println("mspan: " + makespan+" tcost: "+totalCost+" lcost: "+loadBalancing +" cost: "+ cost*10E-3);
 
         return cost*10E-3;
-    }
-    
+    }*/
+
 //    private double computeCostOfAllVms() {
 //        var result = this.getResult().entrySet().stream().collect(Collectors.groupingBy(Map.Entry::getValue));
 //        var averageCost = result.entrySet().stream().mapToDouble(this::getVmCost).sum();

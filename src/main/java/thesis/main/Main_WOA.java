@@ -20,13 +20,13 @@ public class Main_WOA {
     public static void main(String[] args) {
         if (args.length > 0)
             CLOUDLETS_TO_CREATE = Integer.parseInt(args[0]);
-        int[] hosts = {50};
+        int[] hosts = {100};
         int[] vms = {50};
-        int[] cloudlets = {60};
+        int[] cloudlets = {160};
 
         // Write headers to the CSV file if the file does not exist
-        if (!new File("woa.csv").exists())
-            writeHeadersToFile("woa.csv");
+        if (!new File("WOA.csv").exists())
+            writeHeadersToFile("WOA.csv");
 
         for (int host : hosts) {
             for (int vm : vms) {

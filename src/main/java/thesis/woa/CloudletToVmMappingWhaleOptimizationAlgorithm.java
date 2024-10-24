@@ -21,7 +21,7 @@ import java.util.stream.IntStream;
 
 public class CloudletToVmMappingWhaleOptimizationAlgorithm implements CloudletToVmMappingHeuristic {
     public static final int POPULATION_SIZE = 100;
-    public static final int MAX_ITERATIONS = 400;
+    public static final int MAX_ITERATIONS = 200;
 
     private final ContinuousDistribution random;
     private int searchesByIteration;
