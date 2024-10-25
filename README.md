@@ -1,4 +1,9 @@
-# cloudsimplus-simulation_ugrad_thesis
+# Enhancing Task Scheduling Efficiency in Cloud Computing: A Study of Hybrid Fireworks (FWA) and Whale Optimization (WOA) Techniques
+
+This project focuses on exploring multiple hybridization models, including se-quential, parallel, and component-level combinations of FWA and WOA. By employing this
+approach, we aim to get the best out of both algorithms and improve task scheduling in dynamic cloud environments. 
+
+#
 
 The repository is organized into the following main folders **(inside src/main/java/thesis)**:
 
