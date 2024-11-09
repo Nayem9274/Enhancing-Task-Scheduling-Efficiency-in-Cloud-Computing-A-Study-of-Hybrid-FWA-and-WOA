@@ -4,6 +4,8 @@ import edu.buet.thesis.le.csa.CloudletToVmMappingCrowSearchAlgorithm;
 import edu.buet.thesis.le.ga.CloudletToVmMappingGeneticAlgorithm;
 import org.cloudsimplus.datacenters.DatacenterCharacteristicsSimple;
 import thesis.fwa.CloudletToVmMappingFireworksAlgorithm;
+import thesis.aco.CloudletToVmMappingAntColonyOptimizationAlgorithm;
+import thesis.pso.CloudletToVmMappingParticleSwarmOptimizationAlgorithm;
 import thesis.sequential.CloudletToVmMappingHybridSequentialAlgorithm;
 import thesis.woa.CloudletToVmMappingWhaleOptimizationAlgorithm;
 import thesis.parallel.CloudletToVmMappingHybridParallelAlgorithm;
@@ -185,6 +187,8 @@ public class SimulationAbstractFactory {
     public static final String PARALLEL_ALGORITHM="PARALLEL";
     public static final String FWA_ENCIRCLING_ALGORITHM="FwaEncircle";
     public static final String WOA_SPARK_ALGORITHM="WoaSpark";
+    public static final String ANTCOLONYOPTIMIZATION_ALGORITHM="ACO";
+    public static final String PARTICLESWARMOPTIMIZATION_ALGORITHM="PSO";
 
     public Simulation getAlgorithm(String type) {
         initialize();
@@ -240,6 +244,20 @@ public class SimulationAbstractFactory {
             case WOA_SPARK_ALGORITHM -> {
                 return new Simulation(
                         new CloudletToVmMappingHybridWoaSparkAlgorithm(new UniformDistr(0, 1)),
+                        hosts, vms, cloudlets
+                );
+
+            }
+            case ANTCOLONYOPTIMIZATION_ALGORITHM -> {
+                return new Simulation(
+                        new CloudletToVmMappingAntColonyOptimizationAlgorithm(new UniformDistr(0, 1)),
+                        hosts, vms, cloudlets
+                );
+
+            }
+            case PARTICLESWARMOPTIMIZATION_ALGORITHM -> {
+                return new Simulation(
+                        new CloudletToVmMappingParticleSwarmOptimizationAlgorithm(new UniformDistr(0, 1)),
                         hosts, vms, cloudlets
                 );
 
@@ -333,6 +351,11 @@ public class SimulationAbstractFactory {
         public double getCPUUtilization() {
             return vms.stream().mapToDouble(VmExtended::getAverageCpuUtilization).sum();
         }
+        
+        public double getThroughput() {
+            return this.getCPUUtilization() / this.getExecutionTime();
+        }
+
 
         public double getBandwidthUtilization() {
             return vms.stream().mapToDouble(VmExtended::getAverageBwUtilization).sum();

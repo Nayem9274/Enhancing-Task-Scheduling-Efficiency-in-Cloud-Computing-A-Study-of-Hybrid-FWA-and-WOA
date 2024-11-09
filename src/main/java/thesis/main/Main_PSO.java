@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 
-public class Main_FWA {
-	private static int HOSTS_TO_CREATE = 100;
+public class Main_PSO {
+    private static int HOSTS_TO_CREATE = 100;
     private static int VMS_TO_CREATE = 50;
     private static int CLOUDLETS_TO_CREATE = 100;
 
@@ -24,10 +24,10 @@ public class Main_FWA {
         int[] vms = {50};
         int[] cloudlets = {100};
         //    int[] cloudlets = {10,20,40,80,100};
-        
+
         // Write headers to the CSV file if the file does not exist
-        if (!new File("FWA.csv").exists())
-            writeHeadersToFile("FWA.csv");
+        if (!new File("PSO.csv").exists())
+            writeHeadersToFile("PSO.csv");
 
         for (int host : hosts) {
             for (int vm : vms) {
@@ -43,69 +43,69 @@ public class Main_FWA {
     private static void simulate(int HOSTS_TO_CREATE, int VMS_TO_CREATE, int CLOUDLETS_TO_CREATE) {
         System.out.printf("Starting Simulations [%d, %d, %d]\n", HOSTS_TO_CREATE, VMS_TO_CREATE, CLOUDLETS_TO_CREATE);
         final var factory = new SimulationAbstractFactory(HOSTS_TO_CREATE, VMS_TO_CREATE, CLOUDLETS_TO_CREATE);
-        var fireworksAlgorithm = factory.getAlgorithm(SimulationAbstractFactory.FIREWORKS_ALGORITHM);
+        var PSOalgorithm = factory.getAlgorithm(SimulationAbstractFactory.PARTICLESWARMOPTIMIZATION_ALGORITHM);
         System.out.printf(
-        	    "Execution Time: \t\t%.2f\n",
-        	    fireworksAlgorithm.getExecutionTime()
-        	);
+                "Execution Time: \t\t%.2f\n",
+                PSOalgorithm.getExecutionTime()
+        );
 
-        	System.out.printf(
-        	    "Fitness: \t\t\t%.6f\n",
-        	    fireworksAlgorithm.getFitness()
-        	);
+        System.out.printf(
+                "Fitness: \t\t\t%.6f\n",
+                PSOalgorithm.getFitness()
+        );
 
-        	System.out.printf(
-        	    "CPU Utilization: \t%.2f\n",
-        	    fireworksAlgorithm.getCPUUtilization()
-        	);
+        System.out.printf(
+                "CPU Utilization: \t%.2f\n",
+                PSOalgorithm.getCPUUtilization()
+        );
 
-        	System.out.printf(
-        	    "RAM Utilization: \t%.2f\n",
-        	    fireworksAlgorithm.getMemoryUtilization()
-        	);
+        System.out.printf(
+                "RAM Utilization: \t%.2f\n",
+                PSOalgorithm.getMemoryUtilization()
+        );
 
-        	System.out.printf(
-        	    "B/W Utilization: \t%.2f\n",
-        	    fireworksAlgorithm.getBandwidthUtilization()
-        	);
+        System.out.printf(
+                "B/W Utilization: \t%.2f\n",
+                PSOalgorithm.getBandwidthUtilization()
+        );
 
-        	System.out.printf(
-        	    "CPU Usage Mean: \t\t%.2f\n",
-        	    fireworksAlgorithm.getCPUUsageMean()
-        	);
+        System.out.printf(
+                "CPU Usage Mean: \t\t%.2f\n",
+                PSOalgorithm.getCPUUsageMean()
+        );
 
-        	System.out.printf(
-        	    "CPU Usage StdDev: \t%.2f\n",
-        	    fireworksAlgorithm.getCPUUsageStandardDeviation()
-        	);
+        System.out.printf(
+                "CPU Usage StdDev: \t%.2f\n",
+                PSOalgorithm.getCPUUsageStandardDeviation()
+        );
 
-        	System.out.printf(
-        	    "Power Consumption: \t%.2f\n",
-        	    fireworksAlgorithm.powerConsumptionMean()
-        	);
+        System.out.printf(
+                "Power Consumption: \t%.2f\n",
+                PSOalgorithm.powerConsumptionMean()
+        );
 
-       
 
-        	writeToFile("fwa.csv", "%d,%d,%d,%.2f,%.6f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n".formatted(
-        	    HOSTS_TO_CREATE,
-        	    VMS_TO_CREATE,
-        	    CLOUDLETS_TO_CREATE,
-        	    fireworksAlgorithm.getExecutionTime(),
-        	    fireworksAlgorithm.getFitness(),
-        	    fireworksAlgorithm.getCPUUtilization(),
-        	    fireworksAlgorithm.getMemoryUtilization(),
-        	    fireworksAlgorithm.getBandwidthUtilization(),
-        	    fireworksAlgorithm.powerConsumptionMean(),
-        	    fireworksAlgorithm.getCPUUsageMean(),
-        	    fireworksAlgorithm.getCPUUsageStandardDeviation()
-        	));
 
-        
+        writeToFile("PSO.csv", "%d,%d,%d,%.2f,%.6f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n".formatted(
+                HOSTS_TO_CREATE,
+                VMS_TO_CREATE,
+                CLOUDLETS_TO_CREATE,
+                PSOalgorithm.getExecutionTime(),
+                PSOalgorithm.getFitness(),
+                PSOalgorithm.getCPUUtilization(),
+                PSOalgorithm.getMemoryUtilization(),
+                PSOalgorithm.getBandwidthUtilization(),
+                PSOalgorithm.powerConsumptionMean(),
+                PSOalgorithm.getCPUUsageMean(),
+                PSOalgorithm.getCPUUsageStandardDeviation()
+        ));
+
+
         System.out.println("Finished Simulations");
     }
 
     private static void writeHeadersToFile(String filePath) {
-        String headers = "hosts,vms,cloudlets,fwa_time,fwa_fitness,fwa_cpu_util,fwa_ram_util,fwa_bw_util,fwa_power,fwa_cpu_mean,fwa_cpu_std\n";
+        String headers = "hosts,vms,cloudlets,pso_time,pso_fitness,pso_cpu_util,pso_ram_util,pso_bw_util,pso_power,pso_cpu_mean,pso_cpu_std\n";
         try (FileWriter fw = new FileWriter(filePath, false); // Open in write mode to overwrite
              BufferedWriter writer = new BufferedWriter(fw)) {
             writer.write(headers);

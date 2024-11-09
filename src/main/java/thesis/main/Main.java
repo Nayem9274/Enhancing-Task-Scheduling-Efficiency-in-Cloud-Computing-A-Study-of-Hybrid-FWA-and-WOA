@@ -25,9 +25,9 @@ public class Main {
         //Enables just some level of log messages.
         Log.setLevel(Level.WARN);
 
-        int[] hosts = {65};
-        int[] vms = {8};
-        int[] cloudlets = {15};
+        int[] hosts = {100};
+        int[] vms = {50};
+        int[] cloudlets = {100};
         // int[] cloudlets = {10, 20, 35, 50, 65, 80, 100, 150, 200};
 
         // Write headers to the CSV file

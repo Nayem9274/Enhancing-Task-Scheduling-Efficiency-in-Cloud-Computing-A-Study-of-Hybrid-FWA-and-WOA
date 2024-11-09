@@ -20,9 +20,9 @@ public class Main_FwaEncircle {
 	public static void main(String[] args) {
 	    if (args.length > 0)
 	        CLOUDLETS_TO_CREATE = Integer.parseInt(args[0]);
-	    int[] hosts = {100};
+	    int[] hosts = {25};
 	    int[] vms = {50};
-	    int[] cloudlets = {60};
+	    int[] cloudlets = {500};
 	    //    int[] cloudlets = {10,20,40,80,100};
 
 	    // Write headers to the CSV file if the file does not exist
@@ -33,7 +33,7 @@ public class Main_FwaEncircle {
 	        for (int vm : vms) {
 	            for (int cloudlet : cloudlets) {
 	               // if (cloudlet > 2 * host || vm > 2 * host || cloudlet > 3 * vm) continue;
-	                for (int i = 0; i < 15; i++)
+	                for (int i = 0; i < 5; i++)
 	                    simulate(host, vm, cloudlet);
 	            }
 	        }

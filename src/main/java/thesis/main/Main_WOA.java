@@ -22,7 +22,7 @@ public class Main_WOA {
             CLOUDLETS_TO_CREATE = Integer.parseInt(args[0]);
         int[] hosts = {100};
         int[] vms = {50};
-        int[] cloudlets = {160};
+        int[] cloudlets = {100};
 
         // Write headers to the CSV file if the file does not exist
         if (!new File("WOA.csv").exists())

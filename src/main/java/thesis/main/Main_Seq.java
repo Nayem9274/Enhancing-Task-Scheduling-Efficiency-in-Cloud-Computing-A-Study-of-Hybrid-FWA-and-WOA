@@ -22,7 +22,7 @@ public class Main_Seq {
 	        CLOUDLETS_TO_CREATE = Integer.parseInt(args[0]);
 	    int[] hosts = {100};
 	    int[] vms = {50};
-	    int[] cloudlets = {60};
+	    int[] cloudlets = {100};
 	    //    int[] cloudlets = {10,20,40,80,100};
 
 	    // Write headers to the CSV file if the file does not exist

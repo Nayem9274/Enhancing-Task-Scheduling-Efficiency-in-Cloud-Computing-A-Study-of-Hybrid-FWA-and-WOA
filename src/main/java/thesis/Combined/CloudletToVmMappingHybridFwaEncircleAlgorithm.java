@@ -35,9 +35,9 @@ public class CloudletToVmMappingHybridFwaEncircleAlgorithm implements CloudletTo
     private final static Logger logger = LoggerFactory
             .getLogger(CloudletToVmMappingHybridFwaEncircleAlgorithm.class.getSimpleName());
 
-    public static final int MAX_ITER_FWA = 200;
-    public static final int MAX_ITER_WOA = 100;
-    public static final int POPULATION_SIZE = 100;
+    public static final int MAX_ITER_FWA = 50;
+    public static final int MAX_ITER_WOA = 50;
+    public static final int POPULATION_SIZE = 50;
     public static final int A = 40;
     public static final int m = 800;
     public static final double a = 0.04;
@@ -459,8 +459,8 @@ public class CloudletToVmMappingHybridFwaEncircleAlgorithm implements CloudletTo
 
             // System.out.println("FWA Pop Size: "+ fwaPopulation.size());
             // logger.debug("[#{}] : {}", fwaIterations, bestSolutionSoFar.getResult());
-            logger.debug("FWA [#%5d] : %.6f".formatted(fwaIterations, bestSolutionSoFar.getFitness()));
-            logger.debug("[#{}] : {}", bestSolutionSoFar.getResult());
+            //logger.debug("FWA [#%5d] : %.6f".formatted(fwaIterations, bestSolutionSoFar.getFitness()));
+            //logger.debug("[#{}] : {}", bestSolutionSoFar.getResult());
 
             // population = new ArrayList<>();
             population.addAll(fwaPopulation);
