@@ -9,6 +9,7 @@ import thesis.pso.CloudletToVmMappingParticleSwarmOptimizationAlgorithm;
 import thesis.sequential.CloudletToVmMappingHybridSequentialAlgorithm;
 import thesis.woa.CloudletToVmMappingWhaleOptimizationAlgorithm;
 import thesis.parallel.CloudletToVmMappingHybridParallelAlgorithm;
+import thesis.wgoa.CloudletToVmMappingWGOA;
 import thesis.Combined.*;
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicyBestFit;
 import org.cloudsimplus.allocationpolicies.VmAllocationPolicyFirstFit;
@@ -157,7 +158,7 @@ public class SimulationAbstractFactory {
 
     static private Cloudlet createCloudlet(Random random) {
 
-        final long length = random.nextInt(10, 1700); //Length of execution (in MI) (1000,5000)-->before
+        final long length = random.nextInt(1000, 5000); //Length of execution (in MI) (1000,5000)-->before, now (10,1700)
         final long fileSize = random.nextInt(50, 200); //Size (in bytes) before execution
         final long outputSize = random.nextInt(50, 200); //Size (in bytes) after execution
 //        final long length = 500; //Length of execution (in MI)
@@ -189,6 +190,7 @@ public class SimulationAbstractFactory {
     public static final String WOA_SPARK_ALGORITHM="WoaSpark";
     public static final String ANTCOLONYOPTIMIZATION_ALGORITHM="ACO";
     public static final String PARTICLESWARMOPTIMIZATION_ALGORITHM="PSO";
+    public static final String WGOA_ALGORITHM="WGOA";
 
     public Simulation getAlgorithm(String type) {
         initialize();
@@ -258,6 +260,13 @@ public class SimulationAbstractFactory {
             case PARTICLESWARMOPTIMIZATION_ALGORITHM -> {
                 return new Simulation(
                         new CloudletToVmMappingParticleSwarmOptimizationAlgorithm(new UniformDistr(0, 1)),
+                        hosts, vms, cloudlets
+                );
+
+            }
+            case WGOA_ALGORITHM -> {
+                return new Simulation(
+                        new CloudletToVmMappingWGOA(new UniformDistr(0, 1)),
                         hosts, vms, cloudlets
                 );
 
